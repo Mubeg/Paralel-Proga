@@ -1,0 +1,43 @@
+#!/bin/bash
+
+# $1 -np
+# $2 N of slots
+# $3 filename
+# $4 param
+
+START_OOB=5555
+START_BTL=5556
+
+NFS_MOUNT_PORT=3049
+NFS_PORT=2049
+
+# before don't forget to check server has nfs mounted on NFS_MOUNT_PORT
+# also DNAT from anywhere to localhost on server (filter by START_OOB) - manually
+# sudo iptables -t nat -A OUTPUT -p tcp --src 0/0 --dst 0/0 --dport 5555 -j DNAT --to-destination 127.0.0.1:5555
+
+ssh -fNR $NFS_MOUNT_PORT:localhost:$NFS_PORT worker
+
+ssh -fNR $START_OOB:localhost:$START_OOB worker
+
+for (( i = 0; i < 2*$2; i++ )) 
+do
+    port=$(($START_BTL+$i))
+    ssh -fNR "$port:localhost:$port" worker
+done
+
+echo "Reverse ssh tunnels setup complete"
+
+for (( i = 0; i < 2*$2; i++ )) 
+do
+    port=$(($START_BTL + $i + 2*$2))
+    ssh -fNL "$port:localhost:$port" worker
+done
+
+echo "All ssh tunnels setup complete"
+
+mpirun --mca btl_tcp_port_min_v4 $START_BTL --mca oob_tcp_static_ipv4_ports $START_OOB --mca btl_tcp_if_include 0.0.0.0/0 --mca btl tcp,self --hostfile my_hosts $1 $2 "$(pwd)/$3" $4
+
+killall ssh
+
+# sudo iptables -t nat -D OUTPUT -p tcp --src 0/0 --dst 0/0 --dport 5555 -j DNAT --to-destination 127.0.0.1:5555
+
