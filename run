@@ -35,7 +35,9 @@ done
 
 echo "All ssh tunnels setup complete"
 
-mpirun --mca btl_tcp_port_min_v4 $START_BTL --mca oob_tcp_static_ipv4_ports $START_OOB --mca btl_tcp_if_include 0.0.0.0/0 --mca btl tcp,self --hostfile my_hosts $1 $2 "$(pwd)/$3" $4
+pathtofile=$(pwd | sed 's/nikita/mpi_user/')
+
+mpirun --mca btl_tcp_port_min_v4 $START_BTL --mca oob_tcp_static_ipv4_ports $START_OOB --mca btl_tcp_if_include 0.0.0.0/0 --mca btl tcp,self --hostfile my_hosts $1 $2 "$pathtofile/$3" $4 $5
 
 killall ssh
 

@@ -6,8 +6,8 @@ filename2 = "better_output.txt"
 
 #res = ["n", "m", "k", "h", "tau", "Error", "Timing"]
 
-K = [2**(i) for i in range(8, 15)]
-M = [2**(i) for i in range(8, 15)]
+K = [2**(i) for i in range(8, 14)]
+M = [2**(i) for i in range(8, 14)]
 
 arr = []
 
@@ -15,6 +15,8 @@ for n in range(1, 5):
         for m in M:
             for k in K:
                 arr.append([n, m, k]) 
+
+print(arr)
 
 with open(filename2, "w") as out:
     out.write("n, m, k, h, tau, Error, Timing\n")
