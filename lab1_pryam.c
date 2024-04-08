@@ -196,8 +196,8 @@ int main(int argc, char *argv[]){
     if(my_rank == 0){
         final_err /= (X_N-1)*(T_N-1);
 
-        printf("Err = %.32Lf\n", final_err);
-        printf("Time spent = %d ms\n", msec);
+        d_printf(0, "Err = %.32Lf\n", final_err);
+        d_printf(0, "Time spent = %d ms\n", msec);
 
         fprintf(file, "%.32LF, %.32LF, %.32Lf, %d\n", h, tau, final_err, msec);
         fclose(file);
