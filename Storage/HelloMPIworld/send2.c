@@ -25,8 +25,8 @@ int main(int argc, char *argv[]){
         MPI_Status status = {};
         clock_t start = clock(), diff;
         for(int i = 0; i < N; i++){
-            MPI_Recv(&res, 1, MPI_INT, (my_rank - 1) % commsize, 0, MPI_COMM_WORLD, &status);
-            MPI_Send(&res, 1, MPI_INT, (my_rank + 1) % commsize, 0, MPI_COMM_WORLD);
+            MPI_Recv(&res, 1, MPI_INT, (my_rank - 1) % commsize, i, MPI_COMM_WORLD, &status);
+            MPI_Send(&res, 1, MPI_INT, (my_rank + 1) % commsize, i, MPI_COMM_WORLD);
         }
         diff = clock() - start;
         int msec = diff * 1000 / CLOCKS_PER_SEC;
@@ -37,8 +37,8 @@ int main(int argc, char *argv[]){
         clock_t start = clock(), diff;
 
         for(int i = 0; i < N; i++){
-            MPI_Send(&res, 1, MPI_INT, (my_rank + 1) % commsize, 0, MPI_COMM_WORLD);
-            MPI_Recv(&res, 1, MPI_INT, (my_rank - 1) % commsize, 0, MPI_COMM_WORLD, &status);
+            MPI_Send(&res, 1, MPI_INT, (my_rank + 1) % commsize, i, MPI_COMM_WORLD);
+            MPI_Recv(&res, 1, MPI_INT, (my_rank - 1) % commsize, i, MPI_COMM_WORLD, &status);
         }
         diff = clock() - start;
         int msec = diff * 1000 / CLOCKS_PER_SEC;
