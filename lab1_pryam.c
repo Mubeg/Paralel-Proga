@@ -17,6 +17,8 @@
 
 //#define TIMING  // if defined measures time from start of calculations to end. Disables error count, debug.
 
+//#define AUTORUN // if defined disables all irrelevant calculations
+
 #define max(smth1, smth2) (smth1 > smth2 ? smth1 : smth2)
 
 #define TRUNCATE // if defined uses M x 2 arrays insteaad of M x K
@@ -39,6 +41,10 @@ t1_PLACE:   placeholder for t+1
 #define DEBUG 0 // defines level of Debug
 
 #ifdef TIMING   // disables debug
+    #undef DEBUG
+#endif
+
+#ifdef AUTORUN  // no debug needed if programm is being autorun
     #undef DEBUG
 #endif
 
@@ -153,6 +159,7 @@ int main(int argc, char *argv[]){
 #ifndef TIMING
             res_err += fabsl(res[x][t1_PLACE]  - u(x*h, (t+1)*tau));
 #endif       
+
             d_printf(10, "rank [%d] res[%d][%d] = %Lf\n", my_rank, x, t1_PLACE, res[x][t1_PLACE]);
 
             if(x == end_x - 1 && my_rank != commsize - 1){
@@ -171,6 +178,7 @@ int main(int argc, char *argv[]){
     diff = clock() - start;
     int msec = diff * 1000 / CLOCKS_PER_SEC;
 
+#ifdef DEBUG
     if(my_rank == commsize - 1){
 
         for(long long int t = 0; t < K_PLACE; t++){
@@ -187,6 +195,7 @@ int main(int argc, char *argv[]){
 
         }
     }
+#endif
 
     d_printf(5, "[%d] Err = %.32Lf\n", my_rank, res_err);
 
@@ -199,7 +208,7 @@ int main(int argc, char *argv[]){
         d_printf(0, "Err = %.32Lf\n", final_err);
         d_printf(0, "Time spent = %d ms\n", msec);
 
-        fprintf(file, "%.32LF, %.32LF, %.32Lf, %d\n", h, tau, final_err, msec);
+        fprintf(file, "%d %.32LF, %.32LF, %.32Lf, %d\n", commsize, tau, final_err, msec);
         fclose(file);
     }
 
